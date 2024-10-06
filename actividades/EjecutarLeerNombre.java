@@ -22,7 +22,16 @@ public class EjecutarLeerNombre {
                 System.out.println((char) c);
             }
             is.close();
-            System.out.println("Valor de salida: " + exitVal);
+            
+            if(exitVal == 1){
+                System.out.println("El nombre es valido");
+                System.out.println(exitVal);
+            }else if(exitVal == -1){
+                System.out.println("El nombre no es valido");
+                System.out.println(exitVal);
+            }else{
+                System.out.println("Algo no funciono ¯\\_(ツ)_/¯");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
