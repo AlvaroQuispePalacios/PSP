@@ -14,46 +14,42 @@ public class SumadoresYFicheros {
     public static void main(String[] args) throws IOException {
         Scanner sc = new Scanner(System.in);
         boolean salir = false;
-        // System.out.println("Dime un numero");
-        // String x = sc.nextLine();
-        // System.out.println("Dime el otro numero");
-        // String y = sc.nextLine();
 
         try {
             //
-            // ProcessBuilder pb = new ProcessBuilder("java",
-            // "sumadoresyficheros\\Suma.java", x, y);
-            // guardarSuma(pb);
-            // Process p = pb.start();
+
             do {
                 System.out.println("1. Sumar dos numeros\n2. Recuperar Suma\n3. Salir");
-                int respuesta = sc.nextInt();
-
+                String respuesta = sc.nextLine();
                 switch (respuesta) {
-                    case 1:
-                        System.out.println("Dime un numero");
-                        String x = sc.nextLine();
-                        System.out.println("Dime el otro numero");
-                        String y = sc.nextLine();
-                        ProcessBuilder pb = new ProcessBuilder("java", "sumadoresyficheros\\Suma.java", x, y);
-                        guardarSuma(pb);
-                        Process p = pb.start();
+                    case "1":
+                        sumarDosNumeros(sc);
                         break;
-                    case 2:
-                        System.out.println("Recuperar dos numeros");
+                    case "2":
+                        System.out.println("Recuperar una suma");
                         break;
-                    case 3:
+                    case "3":
                         salir = true;
                     default:
                         break;
                 }
-            } while (salir != true);
+            } while (!salir);
 
             sc.close();
 
         } catch (Exception e) {
             e.getStackTrace();
         }
+    }
+
+    public static void sumarDosNumeros(Scanner sc) throws IOException{
+        System.out.println("Dime un numero");
+        String x = sc.nextLine();
+        System.out.println("Dime el otro numero");
+        String y = sc.nextLine();
+        ProcessBuilder pb = new ProcessBuilder("java", "sumadoresyficheros\\Suma.java", x, y);
+        guardarSuma(pb);
+        Process p = pb.start();
     }
 
     public static void guardarSuma(ProcessBuilder pb) {
