@@ -1,6 +1,7 @@
 package sumadoresyficheros;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -26,10 +27,11 @@ public class SumadoresYFicheros {
                         sumarDosNumeros(sc);
                         break;
                     case "2":
-                        System.out.println("Recuperar una suma");
+                        recuperarSuma(sc);
                         break;
                     case "3":
                         salir = true;
+                        break;
                     default:
                         break;
                 }
@@ -42,7 +44,7 @@ public class SumadoresYFicheros {
         }
     }
 
-    public static void sumarDosNumeros(Scanner sc) throws IOException{
+    public static void sumarDosNumeros(Scanner sc) throws IOException {
         System.out.println("Dime un numero");
         String x = sc.nextLine();
         System.out.println("Dime el otro numero");
@@ -50,6 +52,43 @@ public class SumadoresYFicheros {
         ProcessBuilder pb = new ProcessBuilder("java", "sumadoresyficheros\\Suma.java", x, y);
         guardarSuma(pb);
         Process p = pb.start();
+    }
+
+    public static void recuperarSuma(Scanner sc) throws IOException {
+        // Crea la carpeta donde se guardaran las sumas si no existe
+        File directorio = new File(".\\sumadoresyficheros\\sumas");
+        if (!directorio.exists()) {
+            directorio.mkdir();
+        }
+
+        // Lista los archivos de la carpeta que contiene las sumas
+        File[] listarArchivos = directorio.listFiles();
+        if (listarArchivos != null && listarArchivos.length > 0) {
+            for (File archivo : listarArchivos) {
+                if (archivo.isFile()) {
+                    System.out.println("Archivo: " + archivo.getName());
+                }
+            }
+            System.out.println(
+                    "Escribe el nombre del archivo sin extensión para recuperar la suma que contiene. Ejm: suma1");
+            String ficheroSuma = sc.nextLine();
+            
+            try {
+                FileReader f = new FileReader(".\\sumadoresyficheros\\sumas\\" + ficheroSuma +".txt");
+                int c = f.read();
+                while (c != -1) {
+                    System.out.print((char) c);
+                    c = f.read();
+                }
+                f.close();
+            } catch (Exception e) {
+                System.out.println("No se ha encontrado el archivo");
+            }
+
+            System.out.println();
+        } else {
+            System.out.println("No hay ninguna suma guardada");
+        }
     }
 
     public static void guardarSuma(ProcessBuilder pb) {
