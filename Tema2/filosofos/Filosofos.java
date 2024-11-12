@@ -5,8 +5,8 @@ import java.util.Random;
 public class Filosofos implements Runnable {
     Palillo derecho;
     Palillo izquierdo;
-    
-    public Filosofos(Palillo palilloIzquierdo, Palillo palilloDerecho){
+
+    public Filosofos(Palillo palilloIzquierdo, Palillo palilloDerecho) {
         this.izquierdo = palilloIzquierdo;
         this.derecho = palilloDerecho;
     }
@@ -17,17 +17,32 @@ public class Filosofos implements Runnable {
         while (true) {
             /* Comer */
             /* Intentar coger palillos */
+            if (derecho.palilloDisponible() && izquierdo.palilloDisponible()) {
+                derecho.tomarPalillo();
+                izquierdo.tomarPalillo();
+                
+                System.out.println(miNombre + " comiendo..." + " palillo "+ derecho.numPalillo + ", palillo " + izquierdo.numPalillo);
+                int milisegs = (1 + generador.nextInt(5)) * 1000;
+                esperarTiempoAzar(miNombre, milisegs);
 
-            /* Si los coge: */
-            System.out.println(miNombre + " comiendo...");
-            int milisegs = (1 + generador.nextInt(5)) * 1000;
-            esperarTiempoAzar(miNombre, milisegs);
-            /* Pensando... */
+                derecho.soltarPalillo();
+                izquierdo.soltarPalillo();
 
-            // Recordemos soltar los palillos
-            System.out.println(miNombre + "  pensando...");
-            milisegs = (1 + generador.nextInt(5)) * 1000;
-            esperarTiempoAzar(miNombre, milisegs);
+                // Recordemos soltar los palillos
+                System.out.println(miNombre + " pensando...");
+                milisegs = (1 + generador.nextInt(5)) * 1000;
+                esperarTiempoAzar(miNombre, milisegs);
+            }
+            // /* Si los coge: */
+            // System.out.println(miNombre + " comiendo...");
+            // int milisegs = (1 + generador.nextInt(5)) * 1000;
+            // esperarTiempoAzar(miNombre, milisegs);
+            // /* Pensando... */
+
+            // // Recordemos soltar los palillos
+            // System.out.println(miNombre + " pensando...");
+            // milisegs = (1 + generador.nextInt(5)) * 1000;
+            // esperarTiempoAzar(miNombre, milisegs);
         }
     }
 
