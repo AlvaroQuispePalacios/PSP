@@ -1,6 +1,6 @@
 package Tema2.ruleta;
 
-public class Ruleta implements Runnable {
+public class Ruleta  {
     int saldo = 50000;
     int numeroActualRuleta;
     boolean ruletaGirando;
@@ -19,6 +19,10 @@ public class Ruleta implements Runnable {
         this.ruletaGirando = false;
     }
 
+    public boolean isRuletaGirando(){
+        return this.ruletaGirando;
+    }
+
     public int getNumeroActualRuleta() {
         return numeroActualRuleta;
     }
@@ -27,25 +31,26 @@ public class Ruleta implements Runnable {
         return this.saldo;
     }
 
-    public void incrementarSaldoBanca(int saldo) {
+    public synchronized void incrementarSaldoBanca(int saldo) {
         this.saldo += saldo;
     }
 
-    public void restarSaldoBanca(int saldo) {
+    public synchronized void restarSaldoBanca(int saldo) {
         this.saldo -= saldo;
     }
 
-    public void run() {
-        while (this.saldo > 0) {
-            try {
-                Thread.sleep(3000);
-            } catch (Exception e) {
-                // TODO: handle exception
-            }
-            girarRuleta();
-            notifyAll();
-        }
-    }
+    // public void run() {
+    //     while (this.saldo > 0) {
+    //         try {
+    //             Thread.sleep(3000);
+    //         } catch (Exception e) {
+    //             // TODO: handle exception
+    //         }
+    //         girarRuleta();
+    //         System.out.println("numero ruleta" + this.numeroActualRuleta);
+    //         notifyAll();
+    //     }
+    // }
 
     // girarRuleta() cada 3seg
 }
