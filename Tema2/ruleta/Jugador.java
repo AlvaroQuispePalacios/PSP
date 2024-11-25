@@ -28,29 +28,35 @@ public class Jugador implements Runnable {
 
     public void run() {
         String miNombre = Thread.currentThread().getName();
-        while (saldo > 0 && ruleta.getSaldoRuleta() > 10) {
-            
+
+        while (saldo > 0) {
+
             elegirNumeroAlAzar();
             restarSaldoJugador(10);
             System.out.println(miNombre + " -> " + this.numeroAlAzar);
-
-            if (!ruleta.isRuletaGirando()) {
-                ruleta.girarRuleta();
-            } else {
-                try {
-                    System.out.println("esperando numero ruleta");
-                    wait();
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                }
+            try {
+                wait();
+                // Thread.sleep(2000);
+            } catch (Exception e) {
+                
             }
+            // if (!ruleta.isRuletaGirando()) {
+            //     ruleta.girarRuleta();
+            // } else {
+            //     try {
+            //         System.out.println("esperando numero ruleta");
+            //         wait();
+            //     } catch (Exception e) {
+            //         System.out.println(e.getMessage());
+            //     }
+            // }
 
-            if (ruleta.getNumeroActualRuleta() == this.numeroAlAzar) {
-                System.out.println("El numero del jugador es igual al de la ruleta :D");
-            }
-            System.out.println();
-            ruleta.pararRuleta();
-            notifyAll();
+            // if (ruleta.getNumeroActualRuleta() == this.numeroAlAzar) {
+            //     System.out.println("El numero del jugador es igual al de la ruleta :D");
+            // }
+            // System.out.println();
+            // ruleta.pararRuleta();
+            // notifyAll();
         }
     }
 

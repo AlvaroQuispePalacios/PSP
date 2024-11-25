@@ -6,7 +6,6 @@ public class Main {
 
     public static void main(String[] args) {
         Ruleta ruleta = new Ruleta();
-        // Thread hiloRuleta = new Thread(ruleta);
         Jugador[] jugadores = new Jugador[4];
         Thread[] hilosAsociados = new Thread[4];
 

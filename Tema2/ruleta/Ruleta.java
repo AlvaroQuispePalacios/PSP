@@ -39,18 +39,20 @@ public class Ruleta  {
         this.saldo -= saldo;
     }
 
-    // public void run() {
-    //     while (this.saldo > 0) {
-    //         try {
-    //             Thread.sleep(3000);
-    //         } catch (Exception e) {
-    //             // TODO: handle exception
-    //         }
-    //         girarRuleta();
-    //         System.out.println("numero ruleta" + this.numeroActualRuleta);
-    //         notifyAll();
-    //     }
-    // }
+
+    public void run() {
+        while (this.saldo > 0) {
+            try {
+                Thread.sleep(3000);
+            } catch (Exception e) {
+                // TODO: handle exception
+            }
+            girarRuleta();
+            System.out.println("numero ruleta" + this.numeroActualRuleta);
+            
+            // notifyAll();
+        }
+    }
 
     // girarRuleta() cada 3seg
 }
