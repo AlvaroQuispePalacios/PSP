@@ -4,10 +4,19 @@ public class Jugador implements Runnable {
     Ruleta ruleta;
     int saldo = 1000;
     int numeroAlAzar;
-    int estrategia; // ?????
+    int numeroRuleta;
+    int estrategia;
 
     public Jugador(Ruleta ruleta) {
         this.ruleta = ruleta;
+    }
+
+    public void setNumeroRuleta(int numeroRuleta) {
+        this.numeroRuleta = numeroRuleta;
+    }
+
+    public int getNumeroRuleta() {
+        return numeroRuleta;
     }
 
     public int getNumeroAlAzar() {
@@ -26,38 +35,36 @@ public class Jugador implements Runnable {
         this.numeroAlAzar = (int) Math.floor(Math.random() * 36 + 1);
     }
 
+    public synchronized void apuesta() {
+        try {
+            wait();
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+    }
+
     public void run() {
         String miNombre = Thread.currentThread().getName();
-
         while (saldo > 0) {
-
             elegirNumeroAlAzar();
-            restarSaldoJugador(10);
-            System.out.println(miNombre + " -> " + this.numeroAlAzar);
+            System.out.println(miNombre + " -> " + this.numeroAlAzar + ", saldo -> " + this.saldo);
             try {
-                wait();
-                // Thread.sleep(2000);
+                apuesta();
             } catch (Exception e) {
-                
+                System.out.println(e.getMessage());
             }
-            // if (!ruleta.isRuletaGirando()) {
-            //     ruleta.girarRuleta();
-            // } else {
-            //     try {
-            //         System.out.println("esperando numero ruleta");
-            //         wait();
-            //     } catch (Exception e) {
-            //         System.out.println(e.getMessage());
-            //     }
-            // }
-
-            // if (ruleta.getNumeroActualRuleta() == this.numeroAlAzar) {
-            //     System.out.println("El numero del jugador es igual al de la ruleta :D");
-            // }
-            // System.out.println();
-            // ruleta.pararRuleta();
-            // notifyAll();
+            if (this.numeroAlAzar == this.numeroRuleta) {
+                ruleta.restarSaldoBanca(360);
+                incrementarSaldoJugador(360);
+            } else {
+                restarSaldoJugador(10);
+                ruleta.incrementarSaldoBanca(10);
+            }
         }
+    }
+
+    public synchronized void liberarJugador() {
+        notifyAll();
     }
 
 }

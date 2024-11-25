@@ -9,10 +9,10 @@ public class Ruleta  {
         this.ruletaGirando = false;
     }
 
-    public void girarRuleta() {
-        this.ruletaGirando = true;
+    public int girarRuleta() {
+        // this.ruletaGirando = true;
         int numeroAleatorio = (int) Math.floor(Math.random() * 37);
-        this.numeroActualRuleta = numeroAleatorio;
+        return numeroAleatorio;
     }
 
     public void pararRuleta() {
@@ -39,20 +39,4 @@ public class Ruleta  {
         this.saldo -= saldo;
     }
 
-
-    public void run() {
-        while (this.saldo > 0) {
-            try {
-                Thread.sleep(3000);
-            } catch (Exception e) {
-                // TODO: handle exception
-            }
-            girarRuleta();
-            System.out.println("numero ruleta" + this.numeroActualRuleta);
-            
-            // notifyAll();
-        }
-    }
-
-    // girarRuleta() cada 3seg
 }
