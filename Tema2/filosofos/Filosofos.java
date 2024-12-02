@@ -17,22 +17,25 @@ public class Filosofos implements Runnable {
         while (true) {
             /* Comer */
             /* Intentar coger palillos */
+            int milisegs = (1 + generador.nextInt(5)) * 1000;
             if (derecho.palilloDisponible() && izquierdo.palilloDisponible()) {
                 derecho.tomarPalillo();
                 izquierdo.tomarPalillo();
                 
                 System.out.println(miNombre + " comiendo..." + " palillo "+ derecho.numPalillo + ", palillo " + izquierdo.numPalillo);
-                int milisegs = (1 + generador.nextInt(5)) * 1000;
                 esperarTiempoAzar(miNombre, milisegs);
 
                 derecho.soltarPalillo();
                 izquierdo.soltarPalillo();
 
                 // Recordemos soltar los palillos
-                System.out.println(miNombre + " pensando...");
-                milisegs = (1 + generador.nextInt(5)) * 1000;
-                esperarTiempoAzar(miNombre, milisegs);
+                // System.out.println(miNombre + " pensando...");
+                // milisegs = (1 + generador.nextInt(5)) * 1000;
+                // esperarTiempoAzar(miNombre, milisegs);
             }
+            System.out.println(miNombre + " pensando...");
+            milisegs = (1 + generador.nextInt(5)) * 1000;
+            esperarTiempoAzar(miNombre, milisegs);
             // /* Si los coge: */
             // System.out.println(miNombre + " comiendo...");
             // int milisegs = (1 + generador.nextInt(5)) * 1000;
