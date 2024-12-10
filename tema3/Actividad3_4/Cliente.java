@@ -1,6 +1,8 @@
 package tema3.Actividad3_4;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Scanner;
@@ -17,10 +19,14 @@ public class Cliente {
             DataOutputStream flujoSalida = new DataOutputStream(salida);
             flujoSalida.writeInt(numero);
 
-            
+            InputStream entrada = cliente.getInputStream();
+            DataInputStream flujoEntrada = new DataInputStream(entrada);
+            System.out.println("El numero al cuadrado es: " + flujoEntrada.readInt());
 
             salida.close();
             flujoSalida.close();
+            entrada.close();
+            flujoEntrada.close();
             cliente.close();
             sc.close();
 
