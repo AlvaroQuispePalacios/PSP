@@ -9,13 +9,12 @@ public class Server2 {
     public static void main(String[] args) throws Exception{
         int numeroPuerto = 4321;
         ServerSocket servidor = new ServerSocket(numeroPuerto);
-        Socket cliente = null;
+        Socket cliente = servidor.accept();
         ObjectInputStream inObj = null;
         ObjectOutputStream outObj = null;
 
         while (true) {
             System.out.println("Esperando cliente");
-            cliente = servidor.accept();
             
             inObj = new ObjectInputStream(cliente.getInputStream());
             Numeros dato = (Numeros) inObj.readObject();

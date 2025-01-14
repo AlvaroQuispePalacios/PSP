@@ -6,25 +6,31 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class Cliente2 {
-    public static void main(String[] args)throws Exception{
+    public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
         Socket cliente = new Socket("localhost", 4321);
         ObjectOutputStream outObjeto = null;
-        int numero = 1;
-        while(numero > 0){
+        Numeros enviar;
+        Numeros recibir;
+        int numero = -1;
+        do {
             System.out.println("Dime un numero");
             numero = sc.nextInt();
-
-            Numeros enviar = new Numeros(numero);
+            
+            enviar = new Numeros(numero);
             outObjeto = new ObjectOutputStream(cliente.getOutputStream());
             outObjeto.reset();
             outObjeto.writeObject(enviar);
-
+    
             ObjectInputStream inObjeto = new ObjectInputStream(cliente.getInputStream());
-            Numeros recibir = (Numeros) inObjeto.readObject();
+            
+            recibir = (Numeros) inObjeto.readObject();
             System.out.println(recibir.getCuadrado());
             System.out.println(recibir.getCubo());
-        }
+            
+        } while (numero > 0);
+
+        
         outObjeto.close();
         cliente.close();
         sc.close();
