@@ -17,7 +17,7 @@ public class Cliente {
             System.out.println("Dime un mensaje");
             String mensaje = sc.nextLine();
 
-            // Necesitras este array es para enviar el mensaje por aca como un DataOutputStream en TCP
+            // Necesitas este array es para enviar el mensaje por aca como un DataOutputStream en TCP
             byte[] enviar = new byte[1024];
             enviar = mensaje.getBytes();
 
