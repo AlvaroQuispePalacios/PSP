@@ -20,7 +20,6 @@ public class Cliente {
             // Necesitas este array es para enviar el mensaje por aca como un DataOutputStream en TCP
             byte[] enviar = new byte[1024];
             enviar = mensaje.getBytes();
-
             // Enviando datagrama al servidor
             DatagramPacket envio = new DatagramPacket(enviar, enviar.length, ipServidor, puerto);
             cliente.send(envio);
