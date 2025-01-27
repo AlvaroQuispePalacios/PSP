@@ -20,6 +20,7 @@ public class Server {
             ObjectInputStream in = new ObjectInputStream(bais);
             Persona personaRecibida = (Persona) in.readObject();
             personaRecibida.setEdad(24);
+            
 
             byte[] enviar = new byte[1024];
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
