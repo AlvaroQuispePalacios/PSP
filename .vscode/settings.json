@@ -2,6 +2,7 @@
     "java.project.referencedLibraries": [
         "lib/**/*.jar",
         "c:\\Users\\ciclesgs\\Downloads\\commons-net-3.10.0.jar",
-        "c:\\Users\\ciclesgs\\Downloads\\commons-email-1.6.0.jar"
+        "c:\\Users\\ciclesgs\\Downloads\\commons-email-1.6.0.jar",
+        "c:\\Users\\Persona\\Downloads\\commons-net-3.10.0.jar"
     ]
 }

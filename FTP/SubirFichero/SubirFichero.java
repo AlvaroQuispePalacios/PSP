@@ -57,8 +57,8 @@ public class SubirFichero {
         FTPClient cliente = new FTPClient();
 
         String servidor = "localhost";
-        String user = "usuario";
-        String pasw = "usuario";
+        String user = "usuario1";
+        String pasw = "usuario1";
 
         try {
             System.out.println("Conectandose a " + servidor);
@@ -66,7 +66,7 @@ public class SubirFichero {
             boolean login = cliente.login(user, pasw);
 
             cliente.setFileType(FTP.BINARY_FILE_TYPE);
-            String direc = "/subir";
+            String direc = "/";
             cliente.enterLocalPassiveMode();
 
             if (login) {
