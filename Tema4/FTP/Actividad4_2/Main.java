@@ -1,8 +1,11 @@
 package Tema4.FTP.Actividad4_2;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.net.ftp.*;
@@ -20,15 +23,19 @@ public class Main {
         buscador.setFileFilter(new FileNameExtensionFilter("Solo archivos txt", "txt"));
         buscador.setCurrentDirectory(new File("C:\\Users\\Persona\\Desktop"));
         int resultado = buscador.showOpenDialog(buscador);
-        boolean isLogin = iniciarSesion();
 
-        if (resultado == JFileChooser.APPROVE_OPTION) {
-            subirFichero(buscador.getSelectedFile().getAbsolutePath());
+        boolean isLogin = iniciarSesion();
+        if (isLogin) {
+            System.out.println("Login correcto");
+            if (resultado == JFileChooser.APPROVE_OPTION) {
+                subirFichero(buscador.getSelectedFile().getAbsolutePath());
+            }
+            cerrarSesion();
         }
 
     }
 
-    public static boolean iniciarSesion(){
+    public static boolean iniciarSesion() {
         boolean login = false;
         try {
             System.out.println("Conectandose al servidor " + servidor);
@@ -42,27 +49,32 @@ public class Main {
         return login;
     }
 
-    public static void subirFichero(String ruta) {
-        System.out.println(ruta);
+    public static void subirFichero(String rutaFicheroASubir) {
+        System.out.println("Fichero a subir " + rutaFicheroASubir);
+        String[] partesRuta = rutaFicheroASubir.split("\\\\");
+        String nombreFichero = partesRuta[partesRuta.length - 1];
+
         try {
-
-
-
-            String directorio = "/";
-            if (login) {
-                System.out.println("Login correcto");
-                // Intenta cambiar al directorio /
-                if (!cliente.changeWorkingDirectory(directorio)) {
-                    String direc = "subir";
-                    if (cliente.makeDirectory(direc)) {
-                        System.out.println("Directorio " + direc + " creado");
-
-                    } else {
-                        System.out.println("No se ha podido crear el directorio");
-                    }
-                }
-                System.out.println("Directorio actual: " + cliente.printWorkingDirectory());
+            System.out.println("Directorio actual" + cliente.printWorkingDirectory());
+            BufferedInputStream bis = new BufferedInputStream(new FileInputStream(rutaFicheroASubir));
+            if (cliente.storeFile(nombreFichero, bis)) {
+                JOptionPane.showMessageDialog(null, nombreFichero + " subido correctamente", "Mensaje",
+                        JOptionPane.INFORMATION_MESSAGE);
+                System.out.println("Fichero subido correctamente");
+            } else {
+                System.out.println("No se ha podido subir el fichero");
             }
+            bis.close();
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+
+    }
+
+    public static void cerrarSesion() {
+        try {
+            cliente.logout();
+            cliente.disconnect();
         } catch (Exception e) {
             // TODO: handle exception
         }
