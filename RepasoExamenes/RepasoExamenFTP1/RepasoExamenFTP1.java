@@ -1,6 +1,9 @@
 package RepasoExamenes.RepasoExamenFTP1;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -64,10 +67,11 @@ public class RepasoExamenFTP1 {
                 seleccionar = sc.nextInt();
                 sc.nextLine();
                 if (seleccionar == 1) {
+                    System.out.println("Cuando un parametro esta entre \"[]\" significa que es opcional");
                     System.out.println("cd --Moverse entre carpetas Ejm: \"cd -nombre-carpeta\"");
                     System.out.println("des --Descargar fichero Ejm: \"des -nombreFichero.extension -rutaDeDestino\"");
-                    System.out.println("subir --Descargar fichero Ejm: \"des -nombreFichero.extension -rutaDeDestino\"");
-
+                    System.out.println(
+                            "subir --Subir fichero Ejm: \"subir -rutaDelArchivo\\archivo.txt -[nuevoNombreDelArchivo.txt]\"");
 
                 } else if (seleccionar == 2) {
                     System.out.print("Dime el comando: ");
@@ -93,16 +97,16 @@ public class RepasoExamenFTP1 {
             FTPFile[] archivosDelServidor = cliente.listFiles(directorioActual);
             for (FTPFile archivo : archivosDelServidor) {
                 if (archivo.isDirectory()) {
-                    archivosOrdenados.add(0,  "\t" + archivo.getName() + "/");
+                    archivosOrdenados.add(0, "\t" + archivo.getName() + "/");
                 } else {
-                    archivosOrdenados.add(archivosOrdenados.size(),"\t" + archivo.getName());
+                    archivosOrdenados.add(archivosOrdenados.size(), "\t" + archivo.getName());
                 }
             }
-            
-            for(String archivoOrdenado : archivosOrdenados){
+
+            for (String archivoOrdenado : archivosOrdenados) {
                 System.out.println(archivoOrdenado);
             }
-            
+
         } catch (Exception e) {
             System.out.println(e.toString());
         }
@@ -138,6 +142,25 @@ public class RepasoExamenFTP1 {
                 System.out.println("No se a agregado ningun parametro");
             }
 
+            // Subir
+        } else if (comandoM.startsWith("subir")) {
+            String[] parametrosComandoSubir;
+            try {
+                parametrosComandoSubir = comandoM.substring(7, comandoM.length()).split("-");
+                // System.out.println("Numeros de parametros del comando subir: " + parametrosComandoSubir.length);
+                String rutaArchivo = parametrosComandoSubir[0].trim();
+                if (parametrosComandoSubir.length == 1) {
+                    // System.out.println("Ruta del archivo " + rutaArchivo);
+                    subirArchivo(rutaArchivo);
+                } else if (parametrosComandoSubir.length == 2) {
+                    String nuevoNombreArchivo = parametrosComandoSubir[1].trim();
+                    subirArchivoConNuevoNombre(rutaArchivo, nuevoNombreArchivo);
+                } else {
+                    System.out.println("Se ha agregado parametros demas");
+                }
+            } catch (Exception e) {
+                System.out.println("No se a agregado ningun parametro " + e.getMessage());
+            }
         } else {
             System.out.println("El comando no es valido");
         }
@@ -151,9 +174,25 @@ public class RepasoExamenFTP1 {
 
     public static void descargarArchivo(String nombreArchivo, String rutaDestino) {
         boolean archivoExiste = archivoExisteServidor(nombreArchivo);
+        File rutaDestinoFichero = new File(rutaDestino);
+
         if (!archivoExiste) {
             System.out.println("El archivo no existe");
             return;
+        }
+
+        if (!rutaDestinoFichero.exists()) {
+            try {
+                if (rutaDestinoFichero.createNewFile()) {
+                    System.out.println("El fichero se ha creado correctamente");
+                } else {
+                    System.out.println("El fichero no se ha podido crear");
+                    ;
+                }
+
+            } catch (Exception e) {
+                System.out.println("El archivo no se puedo crear" + e.toString());
+            }
         }
 
         try {
@@ -174,7 +213,7 @@ public class RepasoExamenFTP1 {
             }
             out.close();
         } catch (Exception e) {
-            System.out.println("Error en descargarArchivos "+e.toString());
+            System.out.println("Error en descargarArchivos " + e.toString());
         }
 
     }
@@ -193,7 +232,51 @@ public class RepasoExamenFTP1 {
         return false;
     }
 
-    public static void validarRutaDeDestino(){
+    public static void subirArchivo(String rutaArchivo) {
+        String[] partesRutaArchivo = rutaArchivo.split("\\\\");
+        String nombreArchivo = partesRutaArchivo[partesRutaArchivo.length - 1];
+        try {
+            if (!cliente.changeWorkingDirectory(directorioActual)) return;
+            // Verificar si el archivo existe en el servidor si existe preguntar si quiere sobreescribir el archivo
+            if(archivoExisteServidor(nombreArchivo)){
+                System.out.println("El archivo ya existe en el servidor. ¿Quiere sobreescribirlo? (Y/N)");
+                String sobreescribir = sc.nextLine().trim().toUpperCase();
+                if(sobreescribir.equals("N")) return;
+            }
 
+            BufferedInputStream bis = new BufferedInputStream(new FileInputStream(rutaArchivo));
+            // 
+            if(cliente.storeFile(nombreArchivo, bis)){
+                System.out.println("Archivo subido correctamente");
+            }else{
+                System.out.println("No se ha podido subir el fichero");
+            }
+            bis.close();
+        } catch (Exception e) {
+            System.out.println("Error al subir el fichero " + e.getMessage());
+        }
+    }
+
+    public static void subirArchivoConNuevoNombre(String rutaArchivo, String nuevoNombre) {
+        try {
+            if (!cliente.changeWorkingDirectory(directorioActual)) return;
+
+            if(archivoExisteServidor(nuevoNombre)){
+                System.out.println("El archivo ya existe en el servidor. ¿Quiere sobreescribirlo? (Y/N)");
+                String sobreescribir = sc.nextLine().trim().toUpperCase();
+                if(sobreescribir.equals("N")) return;
+            }
+
+            BufferedInputStream bis = new BufferedInputStream(new FileInputStream(rutaArchivo));
+
+            if(cliente.storeFile(nuevoNombre, bis)){
+                System.out.println("Archivo subido correctamente");
+            }else{
+                System.out.println("No se ha podido subir el fichero");
+            }
+            bis.close();
+        } catch (Exception e) {
+            System.out.println("Error al subir el fichero " + e.getMessage());
+        }
     }
 }
