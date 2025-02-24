@@ -22,6 +22,7 @@ public class Main {
         buscador.setMultiSelectionEnabled(true);
         buscador.setFileFilter(new FileNameExtensionFilter("Solo archivos txt", "txt"));
         buscador.setCurrentDirectory(new File("C:\\Users\\Persona\\Desktop"));
+        
         int resultado = buscador.showOpenDialog(buscador);
 
         boolean isLogin = iniciarSesion();

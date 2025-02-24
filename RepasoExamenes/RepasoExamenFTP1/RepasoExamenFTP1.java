@@ -25,8 +25,7 @@ public class RepasoExamenFTP1 {
             // Limpiar el buffer
             sc.nextLine();
             if (seleccionar == 1) {
-                if (!iniciarSesion())
-                    return;
+                if (!iniciarSesion()) return;
                 System.out.println("Sesion iniciada correctamente\n");
                 menuClienteFTP();
             }
@@ -63,6 +62,7 @@ public class RepasoExamenFTP1 {
                 directorioActual = cliente.printWorkingDirectory();
 
                 mostrarArchivosDelServidorFTP();
+                
                 System.out.println("1. Ver comandos\n2. Ingresar comando");
                 seleccionar = sc.nextInt();
                 sc.nextLine();
@@ -72,6 +72,12 @@ public class RepasoExamenFTP1 {
                     System.out.println("des --Descargar fichero Ejm: \"des -nombreFichero.extension -rutaDeDestino\"");
                     System.out.println(
                             "subir --Subir fichero Ejm: \"subir -rutaDelArchivo\\archivo.txt -[nuevoNombreDelArchivo.txt]\"");
+                    System.out.println(
+                            "mkdir --Crear un directorio en el directorio actual Ejm: \"mkdir -nombreDirectorio\"");
+                    System.out.println(
+                            "rename --Cambia el nombre de un fichero Ejm: \"rename -nombreFicheroActual.extension -nuevoNombre.extension\"");
+                    System.out.println(
+                            "rm --Eliminar un directorio o fichero en la ruta actual Ejm: \"rm -nombreDirectorioOFichero\"");
 
                 } else if (seleccionar == 2) {
                     System.out.print("Dime el comando: ");
@@ -120,19 +126,25 @@ public class RepasoExamenFTP1 {
         }
 
         if (comandoM.startsWith("cd")) {
-            System.out.println("Es una movimiento");
+            String[] parametrosComandoMoverse = comandoM.substring(4, comandoM.length()).split("-");
+            if (parametrosComandoMoverse.length == 1) {
+                String rutaCarpeta = parametrosComandoMoverse[0].trim();
+                moverseACarpeta(rutaCarpeta);
+            } else {
+                System.out.println("Se ha agregado un parametro demas");
+            }
 
         } else if (comandoM.startsWith("des")) {
-            String[] comandoDescargar;
+            String[] parametrosComandoDescargar;
             try {
-                comandoDescargar = comandoM.substring(5, comandoM.length()).split("-");
+                parametrosComandoDescargar = comandoM.substring(5, comandoM.length()).split("-");
 
-                if (comandoDescargar.length == 1) {
+                if (parametrosComandoDescargar.length == 1) {
                     System.out.println("Falta la ruta de destino");
 
-                } else if (comandoDescargar.length == 2) {
-                    String nombreArchivo = comandoDescargar[0].trim();
-                    String rutaDestino = comandoDescargar[1].trim();
+                } else if (parametrosComandoDescargar.length == 2) {
+                    String nombreArchivo = parametrosComandoDescargar[0].trim();
+                    String rutaDestino = parametrosComandoDescargar[1].trim();
                     descargarArchivo(nombreArchivo, rutaDestino);
 
                 } else {
@@ -147,10 +159,8 @@ public class RepasoExamenFTP1 {
             String[] parametrosComandoSubir;
             try {
                 parametrosComandoSubir = comandoM.substring(7, comandoM.length()).split("-");
-                // System.out.println("Numeros de parametros del comando subir: " + parametrosComandoSubir.length);
                 String rutaArchivo = parametrosComandoSubir[0].trim();
                 if (parametrosComandoSubir.length == 1) {
-                    // System.out.println("Ruta del archivo " + rutaArchivo);
                     subirArchivo(rutaArchivo);
                 } else if (parametrosComandoSubir.length == 2) {
                     String nuevoNombreArchivo = parametrosComandoSubir[1].trim();
@@ -161,19 +171,59 @@ public class RepasoExamenFTP1 {
             } catch (Exception e) {
                 System.out.println("No se a agregado ningun parametro " + e.getMessage());
             }
+
+        } else if (comandoM.startsWith("mkdir")) {
+            String[] parametrosCrearDirectorio = comandoM.substring(7, comandoM.length()).split("-");
+            if (parametrosCrearDirectorio.length == 1) {
+                String nombreDirectorio = parametrosCrearDirectorio[0];
+                crearDirectorio(nombreDirectorio);
+            } else {
+                System.out.println("Se ha agregado parametros demas");
+            }
+
+        } else if (comandoM.startsWith("rename")) {
+            String[] parametrosRenombrarFichero = comandoM.substring(8, comandoM.length()).split("-");
+            if (parametrosRenombrarFichero.length == 1) {
+                System.out.println("Falta un paremetro");
+            } else if (parametrosRenombrarFichero.length == 2) {
+                String nombreActual = parametrosRenombrarFichero[0].trim();
+                String nuevoNombre = parametrosRenombrarFichero[1].trim();
+                renombrarFichero(nombreActual, nuevoNombre);
+            }
+
+        } else if (comandoM.startsWith("rm")) {
+            String[] parametroEliminar = comandoM.substring(4, comandoM.length()).split("-");
+            if (parametroEliminar.length == 1) {
+                String nombreEliminar = parametroEliminar[0].trim();
+                eliminar(nombreEliminar);
+            }
+
         } else {
             System.out.println("El comando no es valido");
         }
 
     }
 
-    public static void moverseACarpeta(String ruta) {
+    public static void moverseACarpeta(String rutaCarpeta) {
+        // Verificamos que sea una carpeta
+        if (archivoExisteEnLaRutaActual(rutaCarpeta)) {
+            System.out.println("La ruta no pertenece a un directorio");
+            return;
+        }
 
-        System.out.println(ruta);
+        try {
+            if (cliente.changeWorkingDirectory(rutaCarpeta)) {
+                directorioActual = rutaCarpeta;
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error al intentar cambiar de directorio " + e.toString());
+        }
+        System.out.println(rutaCarpeta);
     }
 
     public static void descargarArchivo(String nombreArchivo, String rutaDestino) {
-        boolean archivoExiste = archivoExisteServidor(nombreArchivo);
+        boolean archivoExiste = archivoExisteEnLaRutaActual(nombreArchivo);
         File rutaDestinoFichero = new File(rutaDestino);
 
         if (!archivoExiste) {
@@ -218,7 +268,7 @@ public class RepasoExamenFTP1 {
 
     }
 
-    public static boolean archivoExisteServidor(String nombreArchivo) {
+    public static boolean archivoExisteEnLaRutaActual(String nombreArchivo) {
         try {
             FTPFile[] archivosDelServidor = cliente.listFiles(directorioActual);
             for (FTPFile archivo : archivosDelServidor) {
@@ -232,23 +282,40 @@ public class RepasoExamenFTP1 {
         return false;
     }
 
+    public static boolean directorioExisteEnLaRutaActual(String nombreDirectorio) {
+        try {
+            FTPFile[] directorios = cliente.listDirectories(directorioActual);
+            for (FTPFile directorio : directorios) {
+                if (directorio.getName().equals(nombreDirectorio)) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error en verificar si existe el directorio en la ruta actual: " + e.getMessage());
+        }
+        return false;
+    }
+
     public static void subirArchivo(String rutaArchivo) {
         String[] partesRutaArchivo = rutaArchivo.split("\\\\");
         String nombreArchivo = partesRutaArchivo[partesRutaArchivo.length - 1];
         try {
-            if (!cliente.changeWorkingDirectory(directorioActual)) return;
-            // Verificar si el archivo existe en el servidor si existe preguntar si quiere sobreescribir el archivo
-            if(archivoExisteServidor(nombreArchivo)){
+            if (!cliente.changeWorkingDirectory(directorioActual))
+                return;
+            // Verificar si el archivo existe en el servidor si existe preguntar si quiere
+            // sobreescribir el archivo
+            if (archivoExisteEnLaRutaActual(nombreArchivo)) {
                 System.out.println("El archivo ya existe en el servidor. ¿Quiere sobreescribirlo? (Y/N)");
                 String sobreescribir = sc.nextLine().trim().toUpperCase();
-                if(sobreescribir.equals("N")) return;
+                if (sobreescribir.equals("N"))
+                    return;
             }
 
             BufferedInputStream bis = new BufferedInputStream(new FileInputStream(rutaArchivo));
-            // 
-            if(cliente.storeFile(nombreArchivo, bis)){
+            //
+            if (cliente.storeFile(nombreArchivo, bis)) {
                 System.out.println("Archivo subido correctamente");
-            }else{
+            } else {
                 System.out.println("No se ha podido subir el fichero");
             }
             bis.close();
@@ -259,24 +326,90 @@ public class RepasoExamenFTP1 {
 
     public static void subirArchivoConNuevoNombre(String rutaArchivo, String nuevoNombre) {
         try {
-            if (!cliente.changeWorkingDirectory(directorioActual)) return;
+            if (!cliente.changeWorkingDirectory(directorioActual))
+                return;
 
-            if(archivoExisteServidor(nuevoNombre)){
+            if (archivoExisteEnLaRutaActual(nuevoNombre)) {
                 System.out.println("El archivo ya existe en el servidor. ¿Quiere sobreescribirlo? (Y/N)");
                 String sobreescribir = sc.nextLine().trim().toUpperCase();
-                if(sobreescribir.equals("N")) return;
+                if (sobreescribir.equals("N"))
+                    return;
             }
 
             BufferedInputStream bis = new BufferedInputStream(new FileInputStream(rutaArchivo));
 
-            if(cliente.storeFile(nuevoNombre, bis)){
+            if (cliente.storeFile(nuevoNombre, bis)) {
                 System.out.println("Archivo subido correctamente");
-            }else{
+            } else {
                 System.out.println("No se ha podido subir el fichero");
             }
             bis.close();
         } catch (Exception e) {
             System.out.println("Error al subir el fichero " + e.getMessage());
+        }
+    }
+
+    public static void crearDirectorio(String nombreDirectorio) {
+        try {
+            if (directorioExisteEnLaRutaActual(nombreDirectorio)) {
+                System.out.println("El directorio ya existe");
+                return;
+            }
+
+            if (cliente.makeDirectory(directorioActual + "/" + nombreDirectorio)) {
+                System.out.println("Directorio creado");
+            } else {
+                System.out.println("No se pudo crear el directorio");
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error en crear el directorio: " + e.getMessage());
+        }
+    }
+
+    public static void renombrarFichero(String nombreActual, String nuevoNombre) {
+        if (!archivoExisteEnLaRutaActual(nombreActual)) {
+            System.out.println("No se ha encontrado un archivo con el nombre: " + nombreActual + " en la ruta actual");
+            return;
+        }
+
+        try {
+            if (cliente.rename(nombreActual, nuevoNombre)) {
+                System.out.println("Archivo renombrado correctamente");
+            } else {
+                System.out.println("No se pudo renombrar el archivo");
+            }
+        } catch (Exception e) {
+            System.out.println("Error al renombrar el fichero " + e.getMessage());
+        }
+    }
+
+    public static void eliminar(String nombreEliminar) {
+        String ruta = directorioActual + "/" + nombreEliminar;
+
+        if (archivoExisteEnLaRutaActual(nombreEliminar)) {
+            try {
+                if (cliente.deleteFile(ruta)) {
+                    System.out.println("fichero eliminado correctamente");
+                }else{
+                    System.out.println("No se puedo eliminar el fichero");
+                }
+            } catch (Exception e) {
+                System.out.println("Error al eliminar el fichero " + e.getMessage());
+            }
+        }
+
+        if (directorioExisteEnLaRutaActual(nombreEliminar)) {
+            try {
+                if(cliente.removeDirectory(ruta)){
+                    System.out.println("Directorio eliminado correctamente");
+                }else{
+                    System.out.println("No se puedo eliminar el directorio tiene archivos dentro");
+                }
+            } catch (Exception e) {
+                System.out.println("Error al eliminar el directorio " + e.getMessage());
+            }
         }
     }
 }
